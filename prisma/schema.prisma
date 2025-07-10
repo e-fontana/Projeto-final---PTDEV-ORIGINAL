@@ -14,6 +14,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  USER
+}
+
 model User {
-  id String @id @default(nanoid())
+  id       String   @id @default(nanoid()) @db.Char(21)
+  name     String
+  email    String   @unique
+  password String
+  role     UserRole @default(USER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  RefreshToken RefreshToken[]
+  Reservations Reservation[]
+
+  @@index([email, name], name: "idx_user_email")
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(nanoid()) @db.Char(21)
+  token     String
+  expiresAt DateTime
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User   User   @relation(fields: [userId], references: [id])
+  userId String @db.Char(21)
+
+  @@index([userId], name: "idx_refresh_token_user_id")
+  @@map("refresh_tokens")
+}
+
+model Room {
+  id          String  @id @default(nanoid()) @db.Char(21)
+  name        String
+  maxCapacity Int
+  description String  @db.Text
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Reservations Reservation[]
+}
+
+model Reservation {
+  id      String   @id @default(nanoid()) @db.Char(21)
+  roomId  String   @db.Char(21)
+  userId  String   @db.Char(21)
+  startAt DateTime
+  endAt   DateTime
+
+  Room Room @relation(fields: [roomId], references: [id])
+  User User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
