@@ -1,4 +1,4 @@
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
 export const registerUserSchema = z.object({
@@ -17,6 +17,5 @@ export const registerUserSchema = z.object({
       'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
     ),
 });
-
-export const RegisterValidationPipe = new ZodValidationPipe(registerUserSchema);
+export class RegisterUserDto extends createZodDto(registerUserSchema) {}
 export type TRegisterUser = z.infer<typeof registerUserSchema>;

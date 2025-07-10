@@ -8,6 +8,7 @@ import {
   Query,
   UsePipes,
 } from '@nestjs/common';
+import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from 'src/common/decorators/public.decorator';
 import { User } from 'src/common/decorators/user.decorator';
 import { AuthService } from './auth.service';
@@ -16,16 +17,18 @@ import {
   RefreshTokenValidationPipe,
   TRefreshTokenDto,
 } from './dto/refresh-token.dto';
-import { RegisterValidationPipe, TRegisterUser } from './dto/register.dto';
+import { RegisterUserDto, TRegisterUser } from './dto/register.dto';
 import { TAuthenticatedUser } from './strategies/jwt-auth.strategy';
 
+@ApiTags('auth')
 @Controller('/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
   @Post('/register')
-  @UsePipes(RegisterValidationPipe)
+  @ApiBody({ type: RegisterUserDto })
+  @ApiOperation({ summary: 'Register a new user' })
   create(@Body() createAuthDto: TRegisterUser) {
     return this.authService.register(createAuthDto);
   }
