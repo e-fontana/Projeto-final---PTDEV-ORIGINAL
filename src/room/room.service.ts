@@ -1,30 +1,105 @@
-import { Injectable } from '@nestjs/common';
-import { CreateRoomDto } from './dto/create-room.dto';
-import { UpdateRoomDto } from './dto/update-room.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { TCreateRoom } from './dto/create-room.dto';
+import { TUpdateRoom } from './dto/update-room.dto';
+import { PrismaService } from '../common/prisma/prisma.service';
 
 @Injectable()
 export class RoomService {
-  create(createRoomDto: CreateRoomDto) {
-    return 'This action adds a new room';
+  constructor(private readonly prismaService: PrismaService) {}
+  
+  async create(createRoomDto: TCreateRoom) {
+    return await this.prismaService.room.create({
+      data: {
+        name: createRoomDto.name,
+        maxCapacity: createRoomDto.maxCapacity,
+        description: createRoomDto.description,
+        isActive: createRoomDto.isActive,
+      }
+    })
   }
 
-  findAll() {
-    return `This action returns all room`;
+  async findAll() {
+    return await this.prismaService.room.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      }
+    })
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} room`;
+  async findOne(id: string) {
+    const room = await this.prismaService.room.findUnique({
+      where: {
+        id
+      }
+    })
+
+    if(!room){
+      throw new NotFoundException('Room not found.')
+    }
+
+    return room
   }
 
-  update(id: number, updateRoomDto: UpdateRoomDto) {
-    return `This action updates a #${id} room`;
+  async update(id: string, updateRoomDto: TUpdateRoom) {
+    const room = await this.prismaService.room.findUnique({
+      where: {
+        id
+      }
+    })
+
+    if(!room){
+      throw new NotFoundException('Room not found.')
+    }
+
+    return await this.prismaService.room.update({
+      where: {
+        id
+      },
+      data: {
+        name: updateRoomDto.name,
+        maxCapacity: updateRoomDto.maxCapacity,
+        description: updateRoomDto.description,
+        isActive: updateRoomDto.isActive,
+      }
+    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} room`;
+  async updateStatus(id: string, updateRoomDto: TUpdateRoom) {
+    const room = await this.prismaService.room.findUnique({
+      where: {
+        id
+      }
+    })
+
+    if(!room){
+      throw new NotFoundException('Room not found.')
+    }
+
+    return await this.prismaService.room.update({
+      where: {
+        id
+      },
+      data: {
+        isActive: updateRoomDto.isActive,
+      }
+    })
   }
 
-  updateStatus(arg0: number, status: string) {
-    throw new Error('Method not implemented.');
+  async remove(id: string) {
+    const room = await this.prismaService.room.findUnique({
+      where: {
+        id
+      }
+    })
+
+    if(!room){
+      throw new NotFoundException('Room not found.')
+    }
+
+    return await this.prismaService.room.delete({
+      where: {
+        id
+      }
+    })
   }
 }

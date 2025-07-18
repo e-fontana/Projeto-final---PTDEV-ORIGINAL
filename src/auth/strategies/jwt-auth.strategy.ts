@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { UserRole } from 'generated/prisma';
+import { UserRole } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { TAccessTokenPayload } from 'src/common/types/tokens';
 import { env } from 'src/utils/env-validator';
