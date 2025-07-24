@@ -16,6 +16,7 @@ export const registerUserSchema = z.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
       'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
     ),
+  role: z.enum(['USER', 'ADMIN']).optional(),
 });
 export class RegisterUserDto extends createZodDto(registerUserSchema) {}
 export type TRegisterUser = z.infer<typeof registerUserSchema>;
