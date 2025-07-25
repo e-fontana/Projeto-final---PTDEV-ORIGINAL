@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/unbound-method */
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
+import { PrismaService } from '../common/prisma/prisma.service';
 import { RoomService } from './room.service';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { NotFoundException } from '@nestjs/common';
 
 
 describe('RoomService', () => {
-  let roomService: RoomService
-  let prismaService: PrismaService
-
+  let roomService: RoomService;
   const mockPrismaService = {
     room: {
       create: jest.fn(),
@@ -17,41 +16,44 @@ describe('RoomService', () => {
       update: jest.fn(),
       delete: jest.fn(),
     },
-  }
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [RoomService, PrismaService],
-    }).overrideProvider(PrismaService).useValue(mockPrismaService).compile();
+    })
+      .overrideProvider(PrismaService)
+      .useValue(mockPrismaService)
+      .compile();
 
-    roomService = module.get<RoomService>(RoomService)
-    prismaService = module.get<PrismaService>(PrismaService)
-  })
+    roomService = module.get<RoomService>(RoomService);
+  });
 
   it('Should be able to create a room', async () => {
-    
     const roomDto = {
       name: 'room name',
       maxCapacity: 2,
       description: 'room description',
       isActive: true,
-    }
-    
+    };
+
     const room = {
       id: 'fakeId',
       ...roomDto,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
-    mockPrismaService.room.create.mockResolvedValue(room)
+    mockPrismaService.room.create.mockResolvedValue(room);
 
-    expect(await roomService.create(roomDto)).toEqual(room)
+    expect(await roomService.create(roomDto)).toEqual(room);
 
-    expect(prismaService.room.create).toHaveBeenCalledWith({data: roomDto})
-  })
+    expect(mockPrismaService.room.create).toHaveBeenCalledWith({
+      data: roomDto,
+    });
+  });
 
-  it('Should be able to find all rooms', async () => {
+  it('Should be able to find all active rooms', async () => {
     const rooms = [
       {
         id: 'fakeId 1',
@@ -80,14 +82,19 @@ describe('RoomService', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-    ]
+    ];
 
-    mockPrismaService.room.findMany.mockResolvedValue(rooms)
+    const activeRooms = rooms.filter((room) => room.isActive);
 
-    expect(await roomService.findAll()).toEqual(rooms)
+    mockPrismaService.room.findMany.mockResolvedValue(activeRooms);
 
-    expect(prismaService.room.findMany).toHaveBeenCalled()
-  })
+    expect(await roomService.findAll()).toEqual(activeRooms);
+
+    expect(mockPrismaService.room.findMany).toHaveBeenCalledWith({
+      where: { isActive: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  });
 
   it('Should be able to find a room by id', async () => {
     const room = {
@@ -98,14 +105,16 @@ describe('RoomService', () => {
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
-    mockPrismaService.room.findUnique.mockResolvedValue(room)
+    mockPrismaService.room.findUnique.mockResolvedValue(room);
 
-    expect(await roomService.findOne('fakeId')).toEqual(room)
+    expect(await roomService.findOne('fakeId')).toEqual(room);
 
-    expect(prismaService.room.findUnique).toHaveBeenCalledWith({where: {id: 'fakeId'}})
-  })
+    expect(mockPrismaService.room.findUnique).toHaveBeenCalledWith({
+      where: { id: 'fakeId' },
+    });
+  });
 
   it('Should be able to update a room', async () => {
     const roomDto = {
@@ -113,21 +122,24 @@ describe('RoomService', () => {
       maxCapacity: 2,
       description: 'room description',
       isActive: true,
-    }
-    
+    };
+
     const room = {
       id: 'fakeId',
       ...roomDto,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
-    mockPrismaService.room.update.mockResolvedValue(room)
+    mockPrismaService.room.update.mockResolvedValue(room);
 
-    expect(await roomService.update('fakeId', roomDto)).toEqual(room)
+    expect(await roomService.update('fakeId', roomDto)).toEqual(room);
 
-    expect(prismaService.room.update).toHaveBeenCalledWith({where: { id: 'fakeId' }, data: roomDto})
-  })
+    expect(mockPrismaService.room.update).toHaveBeenCalledWith({
+      where: { id: 'fakeId' },
+      data: roomDto,
+    });
+  });
 
   it('Should be able to update the status of a room', async () => {
     const roomDto = {
@@ -135,22 +147,24 @@ describe('RoomService', () => {
       maxCapacity: 2,
       description: 'room description',
       isActive: false,
-    }
-    
+    };
+
     const room = {
       id: 'fakeId',
       ...roomDto,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
+    mockPrismaService.room.update.mockResolvedValue(room);
 
-    mockPrismaService.room.update.mockResolvedValue(room)
+    expect(await roomService.updateStatus('fakeId', roomDto)).toEqual(room);
 
-    expect(await roomService.updateStatus('fakeId', roomDto)).toEqual(room)
-
-    expect(prismaService.room.update).toHaveBeenCalledWith({where: { id: 'fakeId' }, data: { isActive: roomDto.isActive }})
-  })
+    expect(mockPrismaService.room.update).toHaveBeenCalledWith({
+      where: { id: 'fakeId' },
+      data: { isActive: roomDto.isActive },
+    });
+  });
 
   it('Should be able to delete a room', async () => {
     const room = {
@@ -161,20 +175,26 @@ describe('RoomService', () => {
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
-    mockPrismaService.room.delete.mockResolvedValue(room)
+    mockPrismaService.room.delete.mockResolvedValue(room);
 
-    expect(await roomService.remove('fakeId')).toEqual(room)
+    expect(await roomService.remove('fakeId')).toEqual(room);
 
-    expect(prismaService.room.delete).toHaveBeenCalledWith({where: { id: 'fakeId' }})
-  })
+    expect(mockPrismaService.room.delete).toHaveBeenCalledWith({
+      where: { id: 'fakeId' },
+    });
+  });
 
   it('Should be able to find a room', async () => {
-    mockPrismaService.room.findUnique.mockResolvedValue(null)
+    mockPrismaService.room.findUnique.mockResolvedValue(null);
 
-    await expect(roomService.findOne('fakeId')).rejects.toThrow(NotFoundException)
+    await expect(roomService.findOne('fakeId')).rejects.toThrow(
+      NotFoundException,
+    );
 
-    expect(prismaService.room.findUnique).toHaveBeenCalledWith({where: { id: 'fakeId' }})
-  })
+    expect(mockPrismaService.room.findUnique).toHaveBeenCalledWith({
+      where: { id: 'fakeId' },
+    });
+  });
 });
