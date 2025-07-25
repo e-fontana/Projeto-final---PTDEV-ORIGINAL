@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  Post,
   Put,
   UsePipes,
 } from '@nestjs/common';
@@ -17,9 +18,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private readonly service: UserService) {}
 
+  @Post() 
+  async create(@Body() createUserDto: CreateUserDto) {
+      return this.service.create(createUserDto);
+    }
+
   @Get('me')
-  async getMe(@User() user: TAuthenticatedUser) {
-    return this.service.findById(user.sub);
+  async getMeById(@User() user: TAuthenticatedUser) {
+    return this.service.findWithoutPassword(user.sub);
   }
 
   @Put('me')
@@ -34,6 +40,7 @@ export class UserController {
   @Delete(':id')
   @Roles('ADMIN')
   deleteUser(@Param('id') id: string) {
-    return this.service.deleteUser(id);
+    return this.service.delete(id);
   }
 }
+

@@ -10,7 +10,7 @@ export class UserService {
   async create(data: AuthRegisterDto) {
     const userExists = await this.prismaService.user.findUnique({
       where: {
-        email: data.username,
+        email: data.email,
       },
       select: {
         id: true,
@@ -23,47 +23,88 @@ export class UserService {
 
     const createdUser = await this.prismaService.user.create({
       data: {
-        email: data.username,
+        email: data.email,
         name: data.name,
         password: data.password,
-      },
-      omit: {
-        password: true,
       },
     });
 
     return createdUser;
   }
 
-  findById(id: string) {
-    return this.prismaService.user.findUnique({
-      where: { id },
-      omit: {
-        password: true,
-      },
+  async findById(id: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: id },
     });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
-  findByEmail(email: string) {
-    return this.prismaService.user.findUnique({
-      where: { email },
+  async findWithoutPassword(id: string){
+    const user = await this.prismaService.user.findUnique({
+      where: { id: id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      }
     });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
-  update(id: string, data: UpdateUserDto) {
-    return this.prismaService.user.update({
-      where: { id },
+  async findByEmail(email: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { email: email },
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  };
+
+  async update(id: string, data: TUpdateUserDto) {
+    const userExists = await this.prismaService.user.findUnique({
+        where: { id: id },
+      });
+
+    if (!userExists) {
+        throw new NotFoundException('User not found');
+      }
+
+    return await this.prismaService.user.update({
+      where: { id: id },
       data: {
         name: data.name,
       },
     });
   }
 
-  deleteUser(id: string) {
-    return this.prismaService.user.delete({
-      where: { id },
-    });
-  }
+  async delete(id: string) {
+    const userExists = await this.prismaService.user.findUnique({
+      where: { id: id },
+    })
+
+    if (!userExists) {
+      throw new NotFoundException('User not found');
+    }
+
+    return await this.prismaService.user.delete({
+      where: { id: id },
+    })
 
   updatePassword(username: string, newPassword: string) {
     return this.prismaService.user.update({

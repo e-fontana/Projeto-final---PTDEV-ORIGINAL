@@ -7,6 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { UserRole } from '@prisma/client';
 import { MailService } from 'src/common/mail/mail.service';
 import * as argon2 from 'argon2';
+import { UserRole } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { TRefreshTokenPayload } from 'src/common/types/tokens';
@@ -28,7 +29,7 @@ export class AuthService {
     const hashedPassword = await argon2.hash(registerUserDto.password);
 
     return this.userService.create({
-      username: registerUserDto.username,
+      email: registerUserDto.email,
       name: registerUserDto.name,
       password: hashedPassword,
     });

@@ -70,7 +70,7 @@ model Reservation {
   userId  String   @db.Char(21)
   startAt DateTime
   endAt   DateTime
-  status  Boolean  @default(true)
+  status  Boolean  @default(true
 
   Room Room @relation(fields: [roomId], references: [id])
   User User @relation(fields: [userId], references: [id], onDelete: Cascade)
