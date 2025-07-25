@@ -13,13 +13,14 @@ import { Roles } from 'src/common/decorators/role.decorator';
 import { User } from 'src/common/decorators/user.decorator';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthRegisterDto } from 'src/auth/dto/register.dto';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly service: UserService) {}
 
   @Post() 
-  async create(@Body() createUserDto: CreateUserDto) {
+  async create(@Body() createUserDto: AuthRegisterDto) {
       return this.service.create(createUserDto);
     }
 

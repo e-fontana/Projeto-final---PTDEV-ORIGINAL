@@ -5,10 +5,9 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserRole } from '@prisma/client';
-import { MailService } from 'src/common/mail/mail.service';
 import * as argon2 from 'argon2';
-import { UserRole } from '@prisma/client';
 import { nanoid } from 'nanoid';
+import { MailService } from 'src/common/mail/mail.service';
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { TRefreshTokenPayload } from 'src/common/types/tokens';
 import { UserService } from 'src/user/user.service';
@@ -29,14 +28,14 @@ export class AuthService {
     const hashedPassword = await argon2.hash(registerUserDto.password);
 
     return this.userService.create({
-      email: registerUserDto.email,
+      username: registerUserDto.username,
       name: registerUserDto.name,
       password: hashedPassword,
     });
   }
 
   async login(loginDto: UserLoginDto) {
-    const userData = await this.userService.findByEmail(loginDto.username);
+    const userData = await this.userService.findByUsername(loginDto.username);
 
     if (!userData) throw new BadRequestException('Invalid credentials');
 
@@ -152,19 +151,19 @@ export class AuthService {
     }
   }
 
-  async sendForgotPasswordEmail(email: string) {
-    const user = await this.userService.findByEmail(email);
+  async sendForgotPasswordEmail(username: string) {
+    const user = await this.userService.findByUsername(username);
 
     if (!user) {
       throw new BadRequestException('User not found');
     }
 
     const token = this.jwtService.sign(
-      { sub: email, iss: 'reset-password' },
+      { sub: username, iss: 'reset-password' },
       { expiresIn: '5m' },
     );
 
-    await this.mailService.sendPasswordResetEmail(email, token);
+    await this.mailService.sendPasswordResetEmail(username, token);
     return { message: 'Password reset email sent successfully' };
   }
 

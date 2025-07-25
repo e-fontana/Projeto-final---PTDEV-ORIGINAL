@@ -13,7 +13,7 @@ describe('AuthService', () => {
 
   const mockUserService = {
     create: jest.fn(),
-    findByEmail: jest.fn(),
+    findByUsername: jest.fn(),
     findById: jest.fn(),
     updatePassword: jest.fn(),
   };
@@ -93,7 +93,7 @@ describe('AuthService', () => {
 
     describe('login', () => {
       it('should throw if user is not found', async () => {
-        mockUserService.findByEmail.mockResolvedValue(null);
+        mockUserService.findByUsername.mockResolvedValue(null);
 
         await expect(
           authService.login({ username: 'x', password: 'x' }),
@@ -101,7 +101,7 @@ describe('AuthService', () => {
       });
 
       it('should throw if password is invalid', async () => {
-        mockUserService.findByEmail.mockResolvedValue({ password: 'hashed' });
+        mockUserService.findByUsername.mockResolvedValue({ password: 'hashed' });
         jest.spyOn(argon2, 'verify').mockResolvedValue(false);
 
         await expect(
@@ -110,7 +110,7 @@ describe('AuthService', () => {
       });
 
       it('should return access and refresh tokens', async () => {
-        mockUserService.findByEmail.mockResolvedValue({
+        mockUserService.findByUsername.mockResolvedValue({
           id: 'user-id',
           password: 'hashed',
           role: UserRole.USER,
@@ -152,7 +152,7 @@ describe('AuthService', () => {
 
     describe('sendForgotPasswordEmail', () => {
       it('should throw if user not found', async () => {
-        mockUserService.findByEmail.mockResolvedValue(null);
+        mockUserService.findByUsername.mockResolvedValue(null);
 
         await expect(
           authService.sendForgotPasswordEmail('test@example.com'),
@@ -160,7 +160,7 @@ describe('AuthService', () => {
       });
 
       it('should send reset email if user is found', async () => {
-        mockUserService.findByEmail.mockResolvedValue({ id: 'user-id' });
+        mockUserService.findByUsername.mockResolvedValue({ id: 'user-id' });
         mockJwtService.sign.mockReturnValue('jwt-token');
 
         const result =

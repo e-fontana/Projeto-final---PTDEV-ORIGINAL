@@ -21,7 +21,7 @@ enum UserRole {
 model User {
   id       String   @id @default(nanoid()) @db.Char(21)
   name     String
-  email    String   @unique
+  username String   @unique
   password String
   role     UserRole @default(USER)
 
@@ -31,7 +31,7 @@ model User {
   RefreshToken RefreshToken[]
   Reservations Reservation[]
 
-  @@index([email, name], name: "idx_user_email")
+  @@index([username, name], name: "idx_user_email")
   @@map("users")
 }
 
@@ -70,7 +70,7 @@ model Reservation {
   userId  String   @db.Char(21)
   startAt DateTime
   endAt   DateTime
-  status  Boolean  @default(true
+  status  Boolean  @default(true)
 
   Room Room @relation(fields: [roomId], references: [id])
   User User @relation(fields: [userId], references: [id], onDelete: Cascade)
