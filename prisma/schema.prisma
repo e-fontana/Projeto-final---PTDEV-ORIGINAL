@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -45,7 +44,7 @@ model RefreshToken {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  User   User   @relation(fields: [userId], references: [id])
+  User   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Char(21)
 
   @@index([userId], name: "idx_refresh_token_user_id")
@@ -71,9 +70,10 @@ model Reservation {
   userId  String   @db.Char(21)
   startAt DateTime
   endAt   DateTime
+  status  Boolean  @default(true)
 
   Room Room @relation(fields: [roomId], references: [id])
-  User User @relation(fields: [userId], references: [id])
+  User User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

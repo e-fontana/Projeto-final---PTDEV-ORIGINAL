@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { UserRole } from 'generated/prisma';
+import { UserRole } from '@prisma/client';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { TAccessTokenPayload } from 'src/common/types/tokens';
 import { env } from 'src/utils/env-validator';
@@ -17,10 +17,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: env.JWT_SECRET,
+      // issuer: env.JWT_ISSUER,
     });
   }
 
   validate(payload: TAccessTokenPayload): TAuthenticatedUser {
+    console.log('JWT Strategy Payload:', payload);
     return {
       sub: payload.sub,
       role: payload.role,
