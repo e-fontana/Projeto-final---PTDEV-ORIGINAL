@@ -16,10 +16,11 @@ export class AdminService {
 
   async deleteReservationById(id: string) {
     try {
-      return this.prismaService.reservation.delete({ where: { id } });
+      await this.prismaService.reservation.delete({ where: { id } });
+      return { message: 'Reservation deleted successfully' };
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
-        throw new BadRequestException(error.message);
+        throw new BadRequestException('Invalid reservation ID');
       }
 
       throw new Error(`Failed to delete reservation with id ${id}`);

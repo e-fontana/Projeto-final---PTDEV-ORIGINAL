@@ -1,10 +1,22 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { TAuthenticatedUser } from 'src/auth/strategies/jwt-auth.strategy';
+import { Roles } from 'src/common/decorators/role.decorator';
 import { User } from '../common/decorators/user.decorator';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { ReservationService } from './reservation.service';
 
-@Controller('reservation')
+@Roles('USER')
+@ApiBearerAuth('access_token')
+@Controller('reservations')
 export class ReservationController {
   constructor(private readonly reservationService: ReservationService) {}
 

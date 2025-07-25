@@ -6,7 +6,6 @@ import { AppModule } from './app.module';
 import { JwtAuthGuard } from './auth/guards/jwt.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { env } from './utils/env-validator';
-import 'reflect-metadata';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +17,16 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .addTag('final-project')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'Authorization',
+        in: 'header',
+      },
+      'access_token',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
@@ -25,7 +34,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalGuards(new JwtAuthGuard(reflector), new RolesGuard(reflector));
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(env.PORT ?? 3000);
 }
 
 bootstrap()

@@ -7,9 +7,9 @@ import { UpdateStatusDTO } from './dto/update-status.dto';
 @Injectable()
 export class RoomService {
   constructor(private readonly prismaService: PrismaService) {}
-  
+
   async create(createRoomDto: CreateRoomDTO) {
-    return await this.prismaService.room.create({
+    return this.prismaService.room.create({
       data: {
         name: createRoomDto.name,
         maxCapacity: createRoomDto.maxCapacity,
@@ -20,7 +20,7 @@ export class RoomService {
   }
 
   async findAll() {
-    return await this.prismaService.room.findMany({
+    return this.prismaService.room.findMany({
       where: {
         isActive: true,
       },
@@ -55,7 +55,7 @@ export class RoomService {
       throw new NotFoundException('Room not found.');
     }
 
-    return await this.prismaService.room.update({
+    return this.prismaService.room.update({
       where: {
         id,
       },
@@ -66,7 +66,7 @@ export class RoomService {
         isActive: updateRoomDto.isActive,
       },
     });
-  }
+  } 
 
   async updateStatus(id: string, updateRoomDto: UpdateStatusDTO) {
     const room = await this.prismaService.room.findUnique({
@@ -79,7 +79,7 @@ export class RoomService {
       throw new NotFoundException('Room not found.');
     }
 
-    return await this.prismaService.room.update({
+    return this.prismaService.room.update({
       where: {
         id,
       },
@@ -100,7 +100,7 @@ export class RoomService {
       throw new NotFoundException('Room not found.');
     }
 
-    return await this.prismaService.room.delete({
+    return this.prismaService.room.delete({
       where: {
         id,
       },

@@ -1,6 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateReservationDto } from './dto/create-reservation.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { CreateReservationDto } from './dto/create-reservation.dto';
 
 @Injectable()
 export class ReservationService {
@@ -13,51 +17,43 @@ export class ReservationService {
         roomId: createReservationDto.roomId,
         startAt: createReservationDto.startAt,
         endAt: createReservationDto.endAt,
-      }
-    })
+      },
+    });
 
     if (reservationExists) {
-      throw new BadRequestException('Reservation already exists')
+      throw new BadRequestException('Reservation already exists');
     }
 
     const reservationConflict = await this.prismaService.reservation.findFirst({
       where: {
         roomId: createReservationDto.roomId,
-        startAt: {lt: createReservationDto.endAt},
-        endAt: {gt: createReservationDto.startAt},
-      } 
-    })
+        startAt: { lt: createReservationDto.endAt },
+        endAt: { gt: createReservationDto.startAt },
+      },
+    });
 
     if (reservationConflict) {
-      throw new BadRequestException('reservation with conflicting time')
+      throw new BadRequestException('reservation with conflicting time');
     }
 
     const createReservation = await this.prismaService.reservation.create({
       data: {
         ...createReservationDto,
         userId,
-      }
-    })
+      },
+    });
 
     return createReservation;
   }
 
-  async findAllByUser(userId: string) { 
-    const user = await this.prismaService.user.findUnique({
-      where: { id: userId },
-    })
-
-    if(!user){
-       throw new NotFoundException('User not found')
-    }
-
+  async findAllByUser(userId: string) {
     const allReservations = await this.prismaService.reservation.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
-    })
+    });
 
-    if(allReservations.length === 0) {
-      throw new BadRequestException('No reservations found for this user');
+    if (!allReservations) {
+      throw new NotFoundException('No reservations found for this user');
     }
 
     return allReservations;
@@ -67,35 +63,34 @@ export class ReservationService {
     const reservation = await this.prismaService.reservation.findFirst({
       where: {
         userId,
-        id
-      }
-    })
+        id,
+      },
+    });
 
-    if(!reservation) {
-      throw new BadRequestException('Reservation not found');
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found');
     }
 
     return reservation;
   }
-  
+
   async delete(userId: string, id: string) {
     const reservation = await this.prismaService.reservation.findFirst({
       where: {
         userId,
-        id
-      }
-    })
+        id,
+      },
+    });
 
-    if(!reservation) {
-      throw new BadRequestException('Reservation not found');
+    if (!reservation) {
+      throw new NotFoundException('Reservation not found');
     }
 
-    return await this.prismaService.reservation.delete({
+    return this.prismaService.reservation.delete({
       where: {
         id,
-      } 
-    })
-
+      },
+    });
   }
 
   async cancel(userId: string, id: string) {
@@ -103,43 +98,40 @@ export class ReservationService {
       where: {
         id: id,
         userId,
-      }
-    })
+      },
+    });
 
-    if(!reservationExists) { 
-      throw new BadRequestException('Reservation not found');
-    }
-      
-    if (new Date(reservationExists.startAt) < new Date(Date.now() + (24 * 60 * 60 * 1000))) {
-      throw new BadRequestException('You can only cancel reservations at least 24 hours in advance');  
+    if (!reservationExists) {
+      throw new NotFoundException('Reservation not found');
     }
 
-    return await this.prismaService.reservation.update({
+    if (
+      new Date(reservationExists.startAt) <
+      new Date(Date.now() + 24 * 60 * 60 * 1000)
+    ) {
+      throw new BadRequestException(
+        'You can only cancel reservations at least 24 hours in advance',
+      );
+    }
+
+    return this.prismaService.reservation.update({
       where: {
         id: id,
       },
       data: {
         status: false,
-      }
-    })
+      },
+    });
   }
 
-  async findUserHistory(userId: string) { 
-    const user = await this.prismaService.user.findUnique({
-      where: { id: userId },
-    })
-
-    if(!user){
-       throw new NotFoundException('User not found')
-    }
-
+  async findUserHistory(userId: string) {
     const allReservations = await this.prismaService.reservation.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
-    })
+    });
 
-    if(allReservations.length === 0) {
-      throw new BadRequestException('No reservations found for this user');
+    if (allReservations.length === 0) {
+      throw new NotFoundException('No reservations found for this user');
     }
 
     return allReservations;

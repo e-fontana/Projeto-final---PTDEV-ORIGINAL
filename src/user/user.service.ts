@@ -89,10 +89,13 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    return await this.prismaService.user.update({
+    return this.prismaService.user.update({
       where: { id: id },
       data: {
         name: data.name,
+      },
+      omit: {
+        password: true,
       },
     });
   }
@@ -106,7 +109,7 @@ export class UserService {
       throw new NotFoundException('User not found');
     }
 
-    return await this.prismaService.user.delete({
+    return this.prismaService.user.delete({
       where: { id: id },
     });
   }

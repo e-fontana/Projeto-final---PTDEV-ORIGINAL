@@ -1,13 +1,5 @@
-
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  IsBoolean,
-  IsInt,
-  IsNumber,
-  IsOptional,
-  IsString,
-  Min,
-} from 'class-validator';
+import { IsBoolean, IsInt, IsNumber, IsString, Min } from 'class-validator';
 
 export class UpdateRoomDTO {
   @ApiProperty({
@@ -15,7 +7,6 @@ export class UpdateRoomDTO {
     required: false,
   })
   @IsString({ message: 'Name must be a string' })
-  @IsOptional()
   name?: string;
 
   @ApiProperty({
@@ -24,7 +15,6 @@ export class UpdateRoomDTO {
   })
   @IsNumber()
   @IsInt({ message: 'Max Capacity must be an integer' })
-  @IsOptional()
   @Min(1, { message: 'Max Capacity must be greater than 0' })
   maxCapacity?: number;
 
@@ -33,7 +23,6 @@ export class UpdateRoomDTO {
     required: false,
   })
   @IsString({ message: 'Description must be a string' })
-  @IsOptional()
   description?: string;
 
   @ApiProperty({
@@ -41,6 +30,5 @@ export class UpdateRoomDTO {
     required: false,
   })
   @IsBoolean()
-  @IsOptional()
   isActive?: boolean;
 }

@@ -63,11 +63,11 @@ describe('AdminService', () => {
       expect(prismaServiceMock.reservation.delete).toHaveBeenCalledWith({
         where: { id: '1' },
       });
-      expect(result).toBe(deletedReservation);
+      expect(result).toStrictEqual({ message: 'Reservation deleted successfully' });
     });
 
     it('should throw BadRequestException if PrismaClientKnownRequestError is thrown', async () => {
-      const error = new PrismaClientKnownRequestError('Mensagem do erro', {
+      const error = new PrismaClientKnownRequestError('Invalid reservation ID', {
         code: 'P2000',
         clientVersion: '4.17.0',
       });
@@ -80,7 +80,7 @@ describe('AdminService', () => {
         BadRequestException,
       );
       await expect(service.deleteReservationById('1')).rejects.toThrow(
-        'Mensagem do erro',
+        'Invalid reservation ID',
       );
     });
 

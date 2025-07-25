@@ -8,7 +8,7 @@ import {
   Query,
   UsePipes,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
 import { User } from 'src/common/decorators/user.decorator';
@@ -19,7 +19,7 @@ import { AuthRegisterDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { TAuthenticatedUser } from './strategies/jwt-auth.strategy';
 
-@ApiTags('auth')
+@ApiTags('Auth')
 @Controller('/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -49,6 +49,7 @@ export class AuthController {
   @Post('/logout')
   @HttpCode(HttpStatus.OK)
   @UsePipes(RefreshTokenDto)
+  @ApiBearerAuth('access_token')
   @ApiOperation({ summary: 'Logout user and invalidate refresh token' })
   logout(@User() user: TAuthenticatedUser) {
     return this.authService.logout(user.sub);
@@ -76,7 +77,6 @@ export class AuthController {
     @Query('token') token: string,
     @Body() resetPasswordDto: ResetPasswordDto,
   ) {
-    console.log(token);
     return this.authService.resetPassword(token, resetPasswordDto.password);
   }
 }

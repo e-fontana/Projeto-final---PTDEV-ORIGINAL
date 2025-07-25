@@ -8,14 +8,15 @@ import {
   Post,
   Put,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../common/decorators/role.decorator';
-import { RoomService } from './room.service';
-import { ApiTags } from '@nestjs/swagger';
 import { CreateRoomDTO } from './dto/create-room.dto';
 import { UpdateRoomDTO } from './dto/update-room.dto';
 import { UpdateStatusDTO } from './dto/update-status.dto';
+import { RoomService } from './room.service';
 
-@ApiTags('room')
+@ApiTags('Room')
+@ApiBearerAuth('access_token')
 @Controller('rooms')
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
@@ -38,7 +39,7 @@ export class RoomController {
 
   @Put(':id')
   @Roles('ADMIN')
-  update(@Param('id') id: string, @Body(UpdateRoomValidationPipe) updateRoomDto: TUpdateRoom) {
+  update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDTO) {
     return this.roomService.update(id, updateRoomDto);
   }
 
