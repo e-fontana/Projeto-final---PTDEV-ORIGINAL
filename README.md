@@ -62,3 +62,9 @@ yarn run start:dev
 ```bash
 yarn run test
 ```
+
+## Swagger
+
+```bash
+http://localhost:{PORT}/api
+```
