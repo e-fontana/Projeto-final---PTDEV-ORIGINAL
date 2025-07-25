@@ -17,10 +17,12 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: env.JWT_SECRET,
+      // issuer: env.JWT_ISSUER,
     });
   }
 
   validate(payload: TAccessTokenPayload): TAuthenticatedUser {
+    console.log('JWT Strategy Payload:', payload);
     return {
       sub: payload.sub,
       role: payload.role,

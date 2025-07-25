@@ -1,13 +1,13 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { TRegisterUser } from '../auth/dto/register.dto';
-import { PrismaService } from '../common/prisma/prisma.service';
-import { TUpdateUserDto } from './dto/update-user.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { AuthRegisterDto } from 'src/auth/dto/register.dto';
+import { PrismaService } from 'src/common/prisma/prisma.service';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async create(data: TRegisterUser) {
+  async create(data: AuthRegisterDto) {
     const userExists = await this.prismaService.user.findUnique({
       where: {
         email: data.email,
@@ -105,5 +105,13 @@ export class UserService {
     return await this.prismaService.user.delete({
       where: { id: id },
     })
+
+  updatePassword(username: string, newPassword: string) {
+    return this.prismaService.user.update({
+      where: { email: username },
+      data: {
+        password: newPassword,
+      },
+    });
   }
 }

@@ -1,5 +1,6 @@
 import { Controller, Delete, Get, Param } from '@nestjs/common';
 import { Roles } from 'src/common/decorators/role.decorator';
+import { ParseNanoIdPipe } from 'src/common/pipes/nanoid.pipe';
 import { AdminService } from './admin.service';
 
 @Roles('ADMIN')
@@ -13,7 +14,7 @@ export class AdminController {
   }
 
   @Delete('/reservations/:id')
-  deleteReservationById(@Param('id') id: string) {
+  deleteReservationById(@Param('id', new ParseNanoIdPipe()) id: string) {
     return this.adminService.deleteReservationById(id);
   }
 }

@@ -1,14 +1,20 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from '@prisma/client';
+import { MailService } from 'src/common/mail/mail.service';
 import * as argon2 from 'argon2';
 import { UserRole } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import { PrismaService } from 'src/common/prisma/prisma.service';
+import { TRefreshTokenPayload } from 'src/common/types/tokens';
 import { UserService } from 'src/user/user.service';
 import { env } from 'src/utils/env-validator';
-import { TLoginDto } from './dto/login.dto';
-import { TRegisterUser } from './dto/register.dto';
-import { TRefreshTokenPayload } from 'src/common/types/tokens';
+import { UserLoginDto } from './dto/login.dto';
+import { AuthRegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,9 +22,10 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
+    private readonly mailService: MailService,
   ) {}
 
-  async register(registerUserDto: TRegisterUser) {
+  async register(registerUserDto: AuthRegisterDto) {
     const hashedPassword = await argon2.hash(registerUserDto.password);
 
     return this.userService.create({
@@ -28,7 +35,7 @@ export class AuthService {
     });
   }
 
-  async login(loginDto: TLoginDto) {
+  async login(loginDto: UserLoginDto) {
     const userData = await this.userService.findByEmail(loginDto.username);
 
     if (!userData) throw new BadRequestException('Invalid credentials');
@@ -91,24 +98,14 @@ export class AuthService {
     };
   }
 
-  async logout(userId: string, refreshToken: string) {
-    try {
-      const tokenPayload =
-        await this.jwtService.verifyAsync<TRefreshTokenPayload>(refreshToken, {
-          ignoreExpiration: false,
-          secret: env.JWT_SECRET,
-        });
+  async logout(userId: string) {
+    await this.prismaService.refreshToken.deleteMany({
+      where: { userId },
+    });
 
-      await this.prismaService.refreshToken.delete({
-        where: { userId, id: tokenPayload.jti },
-      });
-
-      return {
-        message: 'User logged out successfully',
-      };
-    } catch {
-      throw new BadRequestException('Invalid refresh token');
-    }
+    return {
+      message: 'User logged out successfully',
+    };
   }
 
   async refreshToken(refreshToken: string) {
@@ -152,6 +149,38 @@ export class AuthService {
       };
     } catch {
       throw new BadRequestException('Invalid refresh token');
+    }
+  }
+
+  async sendForgotPasswordEmail(email: string) {
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+
+    const token = this.jwtService.sign(
+      { sub: email, iss: 'reset-password' },
+      { expiresIn: '5m' },
+    );
+
+    await this.mailService.sendPasswordResetEmail(email, token);
+    return { message: 'Password reset email sent successfully' };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    try {
+      const tokenPayload = await this.jwtService.verify<
+        Promise<{ sub: string }>
+      >(token, {
+        secret: env.JWT_SECRET,
+        issuer: 'reset-password',
+        ignoreExpiration: false,
+      });
+      const hashedPassword = await argon2.hash(newPassword);
+      await this.userService.updatePassword(tokenPayload.sub, hashedPassword);
+    } catch {
+      throw new ForbiddenException('Invalid or expired reset password token');
     }
   }
 }

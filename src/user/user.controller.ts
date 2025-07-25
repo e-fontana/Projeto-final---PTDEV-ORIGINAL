@@ -8,15 +8,11 @@ import {
   Put,
   UsePipes,
 } from '@nestjs/common';
-import { TAuthenticatedUser } from '../auth/strategies/jwt-auth.strategy';
-import { Roles } from '../common/decorators/role.decorator';
-import { User } from '../common/decorators/user.decorator';
-import {
-  TUpdateUserDto,
-  UpdateUserValidationPipe,
-} from './dto/update-user.dto';
+import { TAuthenticatedUser } from 'src/auth/strategies/jwt-auth.strategy';
+import { Roles } from 'src/common/decorators/role.decorator';
+import { User } from 'src/common/decorators/user.decorator';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -33,16 +29,16 @@ export class UserController {
   }
 
   @Put('me')
-  @UsePipes(UpdateUserValidationPipe) //SÓ DÁ UPDATE NO NAME???
+  @UsePipes(UpdateUserDto)
   async updateMe(
     @User() user: TAuthenticatedUser,
-    @Body() updateUserDto: TUpdateUserDto,
+    @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.service.update(user.sub, updateUserDto);
   }
 
   @Delete(':id')
-  @Roles('ADMIN') // DEU UNAUTHORIZED
+  @Roles('ADMIN')
   deleteUser(@Param('id') id: string) {
     return this.service.delete(id);
   }

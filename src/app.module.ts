@@ -8,6 +8,7 @@ import { env } from './utils/env-validator';
 import { ReservationModule } from './reservation/reservation.module';
 import { RoomModule } from './room/room.module';
 import { AdminModule } from './admin/admin.module';
+import { MailModule } from './common/mail/mail.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { AdminModule } from './admin/admin.module';
     ReservationModule,
     RoomModule,
     AdminModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService],
