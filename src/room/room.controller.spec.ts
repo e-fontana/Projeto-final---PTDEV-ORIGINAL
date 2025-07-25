@@ -18,10 +18,13 @@ describe('RoomController', () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [RoomController],
       providers: [RoomService],
-    }).overrideProvider(RoomService).useValue(mockRoomService).compile();
+    })
+      .overrideProvider(RoomService)
+      .useValue(mockRoomService)
+      .compile();
 
     controller = module.get<RoomController>(RoomController);
-  })
+  });
 
   it('Should be able to create a room', async () => {
     const room = {
@@ -32,16 +35,16 @@ describe('RoomController', () => {
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
-    mockRoomService.create.mockResolvedValue(room)
+    mockRoomService.create.mockResolvedValue(room);
 
-    expect(await controller.create(room)).toEqual(room)
+    expect(await controller.create(room)).toEqual(room);
 
-    expect(mockRoomService.create).toHaveBeenCalledWith(room)
-  })
+    expect(mockRoomService.create).toHaveBeenCalledWith(room);
+  });
 
-  it('Should be able to find all rooms', async () => {
+  it('Should be able to find all active rooms', async () => {
     const rooms = [
       {
         id: 'fakeId 1',
@@ -70,14 +73,16 @@ describe('RoomController', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-    ]
+    ];
 
-    mockRoomService.findAll.mockResolvedValue(rooms)
+    const activeRooms = rooms.filter((room) => room.isActive);
 
-    expect(await controller.findAll()).toEqual(rooms)
+    mockRoomService.findAll.mockResolvedValue(activeRooms);
 
-    expect(mockRoomService.findAll).toHaveBeenCalled()
-  })
+    expect(await controller.findAll()).toEqual(activeRooms);
+
+    expect(mockRoomService.findAll).toHaveBeenCalled();
+  });
 
   it('Should be able to find a room by id', async () => {
     const room = {
@@ -88,14 +93,14 @@ describe('RoomController', () => {
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
-    mockRoomService.findOne.mockResolvedValue(room)
+    mockRoomService.findOne.mockResolvedValue(room);
 
-    expect(await controller.findOne('fakeId')).toEqual(room)
+    expect(await controller.findOne('fakeId')).toEqual(room);
 
-    expect(mockRoomService.findOne).toHaveBeenCalledWith('fakeId')
-  })
+    expect(mockRoomService.findOne).toHaveBeenCalledWith('fakeId');
+  });
 
   it('Should be able to update a room', async () => {
     const room = {
@@ -106,14 +111,14 @@ describe('RoomController', () => {
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
-    mockRoomService.update.mockResolvedValue(room)
+    mockRoomService.update.mockResolvedValue(room);
 
-    expect(await controller.update('fakeId', room)).toEqual(room)
+    expect(await controller.update('fakeId', room)).toEqual(room);
 
-    expect(mockRoomService.update).toHaveBeenCalledWith('fakeId', room)
-  })
+    expect(mockRoomService.update).toHaveBeenCalledWith('fakeId', room);
+  });
 
   it('Should be able to update the status of a room', async () => {
     const room = {
@@ -124,14 +129,18 @@ describe('RoomController', () => {
       isActive: false,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
-    mockRoomService.updateStatus.mockResolvedValue(room)
+    mockRoomService.updateStatus.mockResolvedValue(room);
 
-    expect(await controller.updateStatus('fakeId', { isActive: false })).toEqual(room)
+    expect(
+      await controller.updateStatus('fakeId', { isActive: false }),
+    ).toEqual(room);
 
-    expect(mockRoomService.updateStatus).toHaveBeenCalledWith('fakeId', {isActive: false})
-  })
+    expect(mockRoomService.updateStatus).toHaveBeenCalledWith('fakeId', {
+      isActive: false,
+    });
+  });
 
   it('Should be able to delete a room', async () => {
     const room = {
@@ -142,12 +151,12 @@ describe('RoomController', () => {
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }
+    };
 
-    mockRoomService.remove.mockResolvedValue(room)
+    mockRoomService.remove.mockResolvedValue(room);
 
-    expect(await controller.remove('fakeId')).toEqual(room)
+    expect(await controller.remove('fakeId')).toEqual(room);
 
-    expect(mockRoomService.remove).toHaveBeenCalledWith('fakeId')
-  })
-})
+    expect(mockRoomService.remove).toHaveBeenCalledWith('fakeId');
+  });
+});

@@ -44,7 +44,10 @@ export class RoomController {
 
   @Patch(':id/status')
   @Roles('ADMIN')
-  updateStatus(@Param('id') id: string, @Body() updateStatusDTO: UpdateStatusDTO) {
+  updateStatus(
+    @Param('id') id: string,
+    @Body() updateStatusDTO: UpdateStatusDTO,
+  ) {
     return this.roomService.updateStatus(id, updateStatusDTO);
   }
 

@@ -7,7 +7,7 @@ import { UpdateStatusDTO } from './dto/update-status.dto';
 @Injectable()
 export class RoomService {
   constructor(private readonly prismaService: PrismaService) {}
-  
+
   async create(createRoomDto: CreateRoomDTO) {
     return await this.prismaService.room.create({
       data: {
@@ -15,92 +15,95 @@ export class RoomService {
         maxCapacity: createRoomDto.maxCapacity,
         description: createRoomDto.description,
         isActive: createRoomDto.isActive,
-      }
-    })
+      },
+    });
   }
 
   async findAll() {
     return await this.prismaService.room.findMany({
+      where: {
+        isActive: true,
+      },
       orderBy: {
         createdAt: 'desc',
-      }
-    })
+      },
+    });
   }
 
   async findOne(id: string) {
     const room = await this.prismaService.room.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
-    if(!room){
-      throw new NotFoundException('Room not found.')
+    if (!room) {
+      throw new NotFoundException('Room not found.');
     }
 
-    return room
+    return room;
   }
 
   async update(id: string, updateRoomDto: UpdateRoomDTO) {
     const room = await this.prismaService.room.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
-    if(!room){
-      throw new NotFoundException('Room not found.')
+    if (!room) {
+      throw new NotFoundException('Room not found.');
     }
 
     return await this.prismaService.room.update({
       where: {
-        id
+        id,
       },
       data: {
         name: updateRoomDto.name,
         maxCapacity: updateRoomDto.maxCapacity,
         description: updateRoomDto.description,
         isActive: updateRoomDto.isActive,
-      }
-    })
+      },
+    });
   }
 
   async updateStatus(id: string, updateRoomDto: UpdateStatusDTO) {
     const room = await this.prismaService.room.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
-    if(!room){
-      throw new NotFoundException('Room not found.')
+    if (!room) {
+      throw new NotFoundException('Room not found.');
     }
 
     return await this.prismaService.room.update({
       where: {
-        id
+        id,
       },
       data: {
         isActive: updateRoomDto.isActive,
-      }
-    })
+      },
+    });
   }
 
   async remove(id: string) {
     const room = await this.prismaService.room.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
 
-    if(!room){
-      throw new NotFoundException('Room not found.')
+    if (!room) {
+      throw new NotFoundException('Room not found.');
     }
 
     return await this.prismaService.room.delete({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
   }
 }
