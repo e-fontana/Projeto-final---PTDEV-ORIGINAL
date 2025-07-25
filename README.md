@@ -34,7 +34,7 @@ All environment variables required by the application are listed in `.env.templa
     - `DATABASE_URL`: The full connection string for your database.
       - _Example for PostgreSQL:_ `postgresql://USER:PASSWORD@HOST:PORT/DATABASE`
     - `JWT_SECRET`: A long, random, and secret string used for signing JWT tokens.
-    - 'JWT_ISSUER': This is not needed, but if you want you can change it.
+    - `JWT_ISSUER`: This is not needed, but if you want you can change it.
     - `PORT`: The port on which the application server will listen (e.g., `3000`).
     - `MAIL_HOST`: The hostname of your SMTP server (e.g., `smtp.example.com`).
     - `MAIL_PORT`: The port for your SMTP server (e.g., `587`).
