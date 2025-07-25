@@ -1,9 +1,16 @@
-import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
-import z from 'zod';
-const loginSchema = z.object({
-  username: z.string().email(),
-  password: z.string().min(8, 'A senha deve possuir pelo menos 8 caracteres'),
-});
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty } from 'class-validator';
 
-export const LoginValidationPipe = new ZodValidationPipe(loginSchema);
-export type TLoginDto = z.infer<typeof loginSchema>;
+export class UserLoginDto {
+  @ApiProperty({
+    example: 'contato@titanci.com.br',
+  })
+  @IsEmail({}, { message: 'Username must be a valid e-mail' })
+  username: string;
+
+  @IsNotEmpty()
+  @ApiProperty({
+    example: 'TIT@Ndapoli2019',
+  })
+  password: string;
+}

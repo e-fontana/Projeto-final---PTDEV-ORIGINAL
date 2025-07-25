@@ -10,11 +10,8 @@ import {
 import { TAuthenticatedUser } from 'src/auth/strategies/jwt-auth.strategy';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { User } from 'src/common/decorators/user.decorator';
-import {
-  TUpdateUserDto,
-  UpdateUserValidationPipe,
-} from './dto/update-user.dto';
 import { UserService } from './user.service';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 export class UserController {
@@ -26,10 +23,10 @@ export class UserController {
   }
 
   @Put('me')
-  @UsePipes(UpdateUserValidationPipe)
+  @UsePipes(UpdateUserDto)
   async updateMe(
     @User() user: TAuthenticatedUser,
-    @Body() updateUserDto: TUpdateUserDto,
+    @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.service.update(user.sub, updateUserDto);
   }
