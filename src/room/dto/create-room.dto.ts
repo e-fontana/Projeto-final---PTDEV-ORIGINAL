@@ -1,18 +1,34 @@
-import { ZodValidationPipe } from 'nestjs-zod';
-import { z } from 'zod';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsBoolean, IsInt, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 
-export const createRoomSchema = z.object({
-    name: z.string().min(1, 'Name is required'),
+export class CreateRoomDTO {
+    @ApiProperty({
+        example: 'Room name'
+    })
+    @IsString({message: 'Name must be a string'})
+    @IsNotEmpty({message: 'Name is required'})
+    name: string;
 
-    maxCapacity: z
-        .number({ error: 'Max Capacity must be a number' })
-        .int({ message: 'Max Capacity must be an integer' })
-        .min(1, { message: 'Max Capacity must be greater than 0' }),
+    @ApiProperty({
+        example: 5
+    })
+    @IsNumber()
+    @IsInt({message: 'Max Capacity must be an integer'})
+    @IsNotEmpty({message: 'Max Capacity is required'})
+    @Min(1, {message: 'Max Capacity must be greater than 0'})
+    maxCapacity: number
 
-    description: z.string().min(1, 'Description is required'),
+    @ApiProperty({
+        example: 'Room description'
+    })
+    @IsNotEmpty({message: 'Description is required'})
+    @IsString({message: 'Description must be a string'})
+    description: string
 
-    isActive: z.boolean().default(true),
-})
-
-export const CreateRoomValidationPipe = new ZodValidationPipe(createRoomSchema);
-export type TCreateRoom = z.infer<typeof createRoomSchema>
+    @ApiProperty({
+        example: true
+    })
+    @IsNotEmpty()
+    @IsBoolean()
+    isActive: boolean = true
+}

@@ -11,8 +11,9 @@ import {
 import { Roles } from '../common/decorators/role.decorator';
 import { RoomService } from './room.service';
 import { ApiTags } from '@nestjs/swagger';
-import { CreateRoomValidationPipe, TCreateRoom } from './dto/create-room.dto';
-import { TUpdateRoom, UpdateRoomValidationPipe } from './dto/update-room.dto';
+import { CreateRoomDTO } from './dto/create-room.dto';
+import { UpdateRoomDTO } from './dto/update-room.dto';
+import { UpdateStatusDTO } from './dto/update-status.dto';
 
 @ApiTags('room')
 @Controller('rooms')
@@ -21,7 +22,7 @@ export class RoomController {
 
   @Post()
   @Roles('ADMIN')
-  create(@Body(CreateRoomValidationPipe) createRoomDto: TCreateRoom) {
+  create(@Body() createRoomDto: CreateRoomDTO) {
     return this.roomService.create(createRoomDto);
   }
 
@@ -37,14 +38,14 @@ export class RoomController {
 
   @Put(':id')
   @Roles('ADMIN')
-  update(@Param('id') id: string, @Body(UpdateRoomValidationPipe) updateRoomDto: TUpdateRoom) {
+  update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDTO) {
     return this.roomService.update(id, updateRoomDto);
   }
 
   @Patch(':id/status')
   @Roles('ADMIN')
-  updateStatus(@Param('id') id: string, @Body('isActive') isActive: boolean) {
-    return this.roomService.updateStatus(id, { isActive });
+  updateStatus(@Param('id') id: string, @Body() updateStatusDTO: UpdateStatusDTO) {
+    return this.roomService.updateStatus(id, updateStatusDTO);
   }
 
   @Delete(':id')

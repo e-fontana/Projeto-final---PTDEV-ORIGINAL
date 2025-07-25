@@ -29,6 +29,7 @@
     "@nestjs/swagger": "^11.2.0",
     "@prisma/client": "^6.11.1",
     "argon2": "^0.43.0",
+    "class-validator": "^0.14.2",
     "dotenv": "^17.2.0",
     "nanoid": "^5.1.5",
     "nestjs-zod": "^4.3.1",

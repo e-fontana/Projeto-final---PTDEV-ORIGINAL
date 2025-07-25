@@ -1,13 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { TCreateRoom } from './dto/create-room.dto';
-import { TUpdateRoom } from './dto/update-room.dto';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { CreateRoomDTO } from './dto/create-room.dto';
+import { UpdateRoomDTO } from './dto/update-room.dto';
+import { UpdateStatusDTO } from './dto/update-status.dto';
 
 @Injectable()
 export class RoomService {
   constructor(private readonly prismaService: PrismaService) {}
   
-  async create(createRoomDto: TCreateRoom) {
+  async create(createRoomDto: CreateRoomDTO) {
     return await this.prismaService.room.create({
       data: {
         name: createRoomDto.name,
@@ -40,7 +41,7 @@ export class RoomService {
     return room
   }
 
-  async update(id: string, updateRoomDto: TUpdateRoom) {
+  async update(id: string, updateRoomDto: UpdateRoomDTO) {
     const room = await this.prismaService.room.findUnique({
       where: {
         id
@@ -64,7 +65,7 @@ export class RoomService {
     })
   }
 
-  async updateStatus(id: string, updateRoomDto: TUpdateRoom) {
+  async updateStatus(id: string, updateRoomDto: UpdateStatusDTO) {
     const room = await this.prismaService.room.findUnique({
       where: {
         id

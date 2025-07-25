@@ -1,9 +1,38 @@
-//import { PartialType } from '@nestjs/swagger';
-import { createRoomSchema } from './create-room.dto';
-import { ZodValidationPipe } from 'nestjs-zod';
-import { z } from 'zod';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsBoolean, IsInt, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
-export const updateRoomSchema = createRoomSchema.partial();
+export class UpdateRoomDTO {
+    @ApiProperty({
+        example: 'Updated room name',
+        required: false
+    })
+    @IsString({ message: 'Name must be a string' })
+    @IsOptional()
+    name?: string;
 
-export const UpdateRoomValidationPipe = new ZodValidationPipe(createRoomSchema);
-export type TUpdateRoom = z.infer<typeof updateRoomSchema>;
+    @ApiProperty({
+        example: 5,
+        required: false
+    })
+    @IsNumber()
+    @IsInt({ message: 'Max Capacity must be an integer' })
+    @IsOptional()
+    @Min(1, { message: 'Max Capacity must be greater than 0' })
+    maxCapacity?: number;
+
+    @ApiProperty({
+        example: 'Updated room description',
+        required: false
+    })
+    @IsString({ message: 'Description must be a string' })
+    @IsOptional()
+    description?: string;
+
+    @ApiProperty({
+        example: true,
+        required: false
+    })
+    @IsBoolean()
+    @IsOptional()
+    isActive?: boolean;
+}
