@@ -2,10 +2,12 @@ import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from '../common/prisma/prisma.service';
 import { RoomService } from './room.service';
+import { PrismaService } from '../common/prisma/prisma.service';
+import { NotFoundException } from '@nestjs/common';
+
 
 describe('RoomService', () => {
   let roomService: RoomService;
-
   const mockPrismaService = {
     room: {
       create: jest.fn(),

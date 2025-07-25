@@ -4,32 +4,36 @@ import {
   Delete,
   Get,
   Param,
+  Post,
   Put,
   UsePipes,
 } from '@nestjs/common';
 import { TAuthenticatedUser } from 'src/auth/strategies/jwt-auth.strategy';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { User } from 'src/common/decorators/user.decorator';
-import {
-  TUpdateUserDto,
-  UpdateUserValidationPipe,
-} from './dto/update-user.dto';
 import { UserService } from './user.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthRegisterDto } from 'src/auth/dto/register.dto';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly service: UserService) {}
 
+  @Post() 
+  async create(@Body() createUserDto: AuthRegisterDto) {
+      return this.service.create(createUserDto);
+    }
+
   @Get('me')
-  async getMe(@User() user: TAuthenticatedUser) {
-    return this.service.findById(user.sub);
+  async getMeById(@User() user: TAuthenticatedUser) {
+    return this.service.findWithoutPassword(user.sub);
   }
 
   @Put('me')
-  @UsePipes(UpdateUserValidationPipe)
+  @UsePipes(UpdateUserDto)
   async updateMe(
     @User() user: TAuthenticatedUser,
-    @Body() updateUserDto: TUpdateUserDto,
+    @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.service.update(user.sub, updateUserDto);
   }
@@ -37,6 +41,7 @@ export class UserController {
   @Delete(':id')
   @Roles('ADMIN')
   deleteUser(@Param('id') id: string) {
-    return this.service.deleteUser(id);
+    return this.service.delete(id);
   }
 }
+

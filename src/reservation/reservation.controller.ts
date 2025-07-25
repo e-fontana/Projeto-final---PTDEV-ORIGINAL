@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { TAuthenticatedUser } from 'src/auth/strategies/jwt-auth.strategy';
-import { User } from 'src/common/decorators/user.decorator';
+import { User } from '../common/decorators/user.decorator';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { ReservationService } from './reservation.service';
 
@@ -27,8 +27,13 @@ export class ReservationController {
   }
 
   @Delete(':id')
-  remove(@User() user: TAuthenticatedUser, @Param('id') id: string) {
-    return this.reservationService.remove(user.sub, id);
+  delete(@User() user: TAuthenticatedUser, @Param('id') id: string) {
+    return this.reservationService.delete(user.sub, id);
+  }
+
+  @Patch(':id')
+  cancel(@User() user: TAuthenticatedUser, @Param('id') id: string) {
+    return this.reservationService.cancel(user.sub, id);
   }
 
   @Get('/history')

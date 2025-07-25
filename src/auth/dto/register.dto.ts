@@ -1,21 +1,30 @@
-import { createZodDto } from 'nestjs-zod';
-import { z } from 'zod';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, IsNotEmpty, Matches } from 'class-validator';
 
-export const registerUserSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  username: z
-    .string({ error: 'Username is required' })
-    .min(4, { message: 'Username must be at least 4 characters' })
-    .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
-      message: 'Username must be a valid email address',
-    }),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 6 characters')
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
-    ),
-});
-export class RegisterUserDto extends createZodDto(registerUserSchema) {}
-export type TRegisterUser = z.infer<typeof registerUserSchema>;
+export class AuthRegisterDto {
+  @ApiProperty({
+    example: 'TITAN DA POLI',
+  })
+  @IsNotEmpty({ message: 'Name is required' })
+  name: string;
+
+  @IsNotEmpty({ message: 'Username is required' })
+  @ApiProperty({
+    example: 'icarolindo@titanci.com.br',
+  })
+  @IsEmail({}, { message: 'Username must be a valid e-mail' })
+  username: string;
+
+  @ApiProperty({
+    example: 'TIT@Ndapoli2019',
+  })
+  @IsNotEmpty({ message: 'Password is required' })
+  @Matches(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    {
+      message:
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+    },
+  )
+  password: string;
+}

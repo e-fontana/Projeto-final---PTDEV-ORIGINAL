@@ -3,21 +3,20 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
-  NotImplementedException,
+  Param,
   Post,
   Query,
   UsePipes,
 } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/role.decorator';
 import { Public } from 'src/common/decorators/public.decorator';
 import { User } from 'src/common/decorators/user.decorator';
 import { AuthService } from './auth.service';
-import { LoginValidationPipe, TLoginDto } from './dto/login.dto';
-import {
-  RefreshTokenValidationPipe,
-  TRefreshTokenDto,
-} from './dto/refresh-token.dto';
-import { RegisterUserDto, TRegisterUser } from './dto/register.dto';
+import { UserLoginDto } from './dto/login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { AuthRegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { TAuthenticatedUser } from './strategies/jwt-auth.strategy';
 
 @ApiTags('auth')
@@ -27,17 +26,16 @@ export class AuthController {
 
   @Public()
   @Post('/register')
-  @ApiBody({ type: RegisterUserDto })
-  @ApiOperation({ summary: 'Register a new user' })
-  create(@Body() createAuthDto: TRegisterUser) {
+  register(@Body() createAuthDto: AuthRegisterDto) {
     return this.authService.register(createAuthDto);
   }
 
   @Public()
   @Post('/login')
   @HttpCode(HttpStatus.OK)
-  @UsePipes(LoginValidationPipe)
-  async login(@Body() loginDto: TLoginDto) {
+  @UsePipes(UserLoginDto)
+  @ApiOperation({ summary: 'Login user and return access and refresh tokens' })
+  async login(@Body() loginDto: UserLoginDto) {
     const { access_token, refresh_token } =
       await this.authService.login(loginDto);
 
@@ -47,37 +45,38 @@ export class AuthController {
     };
   }
 
+  @Roles('USER')
   @Post('/logout')
   @HttpCode(HttpStatus.OK)
-  @UsePipes(RefreshTokenValidationPipe)
-  logout(
-    @User() user: TAuthenticatedUser,
-    @Body() refreshTokenDto: TRefreshTokenDto,
-  ) {
-    return this.authService.logout(user.sub, refreshTokenDto.refreshToken);
+  @UsePipes(RefreshTokenDto)
+  @ApiOperation({ summary: 'Logout user and invalidate refresh token' })
+  logout(@User() user: TAuthenticatedUser) {
+    return this.authService.logout(user.sub);
   }
 
   @Public()
   @Post('/refresh')
   @HttpCode(HttpStatus.OK)
-  @UsePipes(RefreshTokenValidationPipe)
-  refresh(@Body() refreshTokenDto: TRefreshTokenDto) {
+  @UsePipes(RefreshTokenDto)
+  refresh(@Body() refreshTokenDto: RefreshTokenDto) {
     return this.authService.refreshToken(refreshTokenDto.refreshToken);
   }
 
   @Public()
-  @Post('/forgot-passord/:email')
+  @Post('/forgot-password/:username')
   @HttpCode(HttpStatus.OK)
-  forgotPassword(@Body('email') email: string) {
-    console.log(email);
-    throw new NotImplementedException();
+  forgotPassword(@Param('username') username: string) {
+    return this.authService.sendForgotPasswordEmail(username);
   }
 
   @Public()
-  @Post('/reset-passord')
+  @Post('/reset-password')
   @HttpCode(HttpStatus.OK)
-  resetPassword(@Query('token') token: string) {
+  resetPassword(
+    @Query('token') token: string,
+    @Body() resetPasswordDto: ResetPasswordDto,
+  ) {
     console.log(token);
-    throw new NotImplementedException();
+    return this.authService.resetPassword(token, resetPasswordDto.password);
   }
 }

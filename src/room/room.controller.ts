@@ -38,7 +38,7 @@ export class RoomController {
 
   @Put(':id')
   @Roles('ADMIN')
-  update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDTO) {
+  update(@Param('id') id: string, @Body(UpdateRoomValidationPipe) updateRoomDto: TUpdateRoom) {
     return this.roomService.update(id, updateRoomDto);
   }
 

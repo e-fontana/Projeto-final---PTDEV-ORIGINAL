@@ -7,7 +7,7 @@ import { UpdateStatusDTO } from './dto/update-status.dto';
 @Injectable()
 export class RoomService {
   constructor(private readonly prismaService: PrismaService) {}
-
+  
   async create(createRoomDto: CreateRoomDTO) {
     return await this.prismaService.room.create({
       data: {
