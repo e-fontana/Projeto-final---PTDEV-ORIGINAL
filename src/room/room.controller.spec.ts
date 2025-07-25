@@ -128,7 +128,7 @@ describe('RoomController', () => {
 
     mockRoomService.updateStatus.mockResolvedValue(room)
 
-    expect(await controller.updateStatus('fakeId', false)).toEqual(room)
+    expect(await controller.updateStatus('fakeId', { isActive: false })).toEqual(room)
 
     expect(mockRoomService.updateStatus).toHaveBeenCalledWith('fakeId', {isActive: false})
   })
