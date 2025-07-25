@@ -1,19 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { TRegisterUser } from 'src/auth/dto/register.dto';
-import { PrismaService } from 'src/common/prisma/prisma.service';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { TRegisterUser } from '../auth/dto/register.dto';
+import { PrismaService } from '../common/prisma/prisma.service';
 import { TUpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
-  deleteUser(id: string) {
-    throw new Error('Method not implemented.');
-  }
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(data: TRegisterUser) {
     const userExists = await this.prismaService.user.findUnique({
       where: {
-        email: data.username,
+        email: data.email,
       },
       select: {
         id: true,
@@ -26,36 +23,67 @@ export class UserService {
 
     const createdUser = await this.prismaService.user.create({
       data: {
-        email: data.username,
+        email: data.email,
         name: data.name,
         password: data.password,
-      },
-      omit: {
-        password: true,
       },
     });
 
     return createdUser;
   }
 
-  findById(id: string) {
-    return this.prismaService.user.findUnique({
-      where: { id },
+  async findById(id: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: id },
     });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
   }
 
-  findByEmail(email: string) {
-    return this.prismaService.user.findUnique({
-      where: { email },
+  async findByEmail(email: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { email: email },
     });
-  }
 
-  update(id: string, data: TUpdateUserDto) {
-    return this.prismaService.user.update({
-      where: { id },
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  };
+
+  async update(id: string, data: TUpdateUserDto) {
+    const userExists = await this.prismaService.user.findUnique({
+        where: { id: id },
+      });
+
+    if (!userExists) {
+        throw new NotFoundException('User not found');
+      }
+
+    return await this.prismaService.user.update({
+      where: { id: id },
       data: {
         name: data.name,
       },
     });
+  }
+
+  async delete(id: string) {
+    const userExists = await this.prismaService.user.findUnique({
+      where: { id: id },
+    })
+
+    if (!userExists) {
+      throw new NotFoundException('User not found');
+    }
+
+    return await this.prismaService.user.delete({
+      where: { id: id },
+    })
   }
 }

@@ -1,1 +1,6 @@
-export class CreateReservationDto {}
+export class CreateReservationDto {
+    roomId: string;
+    startAt: Date;
+    endAt: Date;
+    status: boolean;
+}

@@ -3,8 +3,8 @@ import { z } from 'zod';
 
 export const registerUserSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  username: z
-    .string({ error: 'Username is required' })
+  email: z
+    .string({ required_error: 'Username is required' })
     .min(4, { message: 'Username must be at least 4 characters' })
     .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
       message: 'Username must be a valid email address',
