@@ -15,8 +15,11 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return a beautiful start message', () => {
+      expect(appController.getHello()).toStrictEqual({
+        message:
+          'Salve, corretor! Você está no ar! Bem-vindo ao mundo dos trainees! 🚀',
+      });
     });
   });
 });

@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserService } from './user.service';
 import { PrismaService } from '../common/prisma/prisma.service';
+import { UserService } from './user.service';
 
 describe('UserService', () => {
   let service: UserService;
@@ -14,7 +14,7 @@ describe('UserService', () => {
       update: jest.Mock;
       delete: jest.Mock;
     };
-  }
+  };
   beforeEach(async () => {
     prismaServiceMock = {
       user: {
@@ -42,23 +42,23 @@ describe('UserService', () => {
       name: 'paulinho',
       email: 'paulinhodomine@gmail.com',
       password: 'oxipaulinhooxi',
-    }
+    };
 
     prismaServiceMock.user.create.mockResolvedValue(fakeUser);
 
     const dto = {
       name: fakeUser.name,
-      email: fakeUser.email,
+      username: fakeUser.email,
       password: fakeUser.password,
-    }
+    };
 
     const result = await service.create(dto);
     expect(result).toEqual(fakeUser);
     expect(prismaServiceMock.user.create).toHaveBeenCalledWith({
       data: {
         ...dto,
-      }
-    })
+      },
+    });
   });
 
   it('should be able to throw error if user already exists', async () => {
@@ -68,15 +68,15 @@ describe('UserService', () => {
       email: 'pedrinhodofortnite',
       password: 'bigchillingtrembala',
     });
-    
+
     const dto = {
       name: 'pedro',
-      email: 'pedrinhodofortnite',
+      username: 'pedrinhodofortnite',
       password: 'bigchillingtrembala',
-    }
+    };
 
     await expect(service.create(dto)).rejects.toThrow('User already exists');
-  })
+  });
 
   it('should be able to find an user by id', async () => {
     const fakeUser = {
@@ -84,7 +84,7 @@ describe('UserService', () => {
       name: 'paulinho',
       email: 'paulinhodomine@gmail.com',
       password: 'oxipaulinhooxi',
-    }
+    };
 
     prismaServiceMock.user.findUnique.mockResolvedValue(fakeUser);
     const result = await service.findById(fakeUser.id);
@@ -92,9 +92,9 @@ describe('UserService', () => {
     expect(prismaServiceMock.user.findUnique).toHaveBeenCalledWith({
       where: {
         id: fakeUser.id,
-      } 
-    })
-  })
+      },
+    });
+  });
 
   it('should be able to find an user without password', async () => {
     const fakeUser = {
@@ -103,63 +103,68 @@ describe('UserService', () => {
       role: 'USER',
       email: 'paulinhodomine@gmail.com',
       password: 'oxipaulinhooxi',
-    	createdAt: '2025-07-24T12:38:07.352Z',
-	    updatedAt: '2025-07-24T13:39:49.143Z'
-    }
+      createdAt: '2025-07-24T12:38:07.352Z',
+      updatedAt: '2025-07-24T13:39:49.143Z',
+    };
 
-        const fakeUserWithoutPassword = {
+    const fakeUserWithoutPassword = {
       id: 'user123',
       name: 'paulinho',
       email: 'paulinhodomine@gmail.com',
       password: 'oxipaulinhooxi',
       role: 'USER',
-    	createdAt: '2025-07-24T12:38:07.352Z',
-	    updatedAt: '2025-07-24T13:39:49.143Z'
-    }
+      createdAt: '2025-07-24T12:38:07.352Z',
+      updatedAt: '2025-07-24T13:39:49.143Z',
+    };
 
-    prismaServiceMock.user.findUnique.mockResolvedValue(fakeUserWithoutPassword);
+    prismaServiceMock.user.findUnique.mockResolvedValue(
+      fakeUserWithoutPassword,
+    );
     const result = await service.findWithoutPassword(fakeUser.id);
     expect(result).toEqual(fakeUserWithoutPassword);
     expect(prismaServiceMock.user.findUnique).toHaveBeenCalledWith({
       where: {
         id: fakeUser.id,
       },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
+      omit: {
+        password: true,
       },
     });
-  })
-  
+  });
+
   it('should be able to update a user', async () => {
     const fakeUser = {
       id: 'user456',
       name: 'itzPedrin150',
       email: 'itzPedrin150@gmail.com',
       password: 'ruladoestoporadoamassado11',
-    }
+    };
 
     prismaServiceMock.user.findUnique.mockResolvedValue(fakeUser);
 
     const newName = {
       name: 'PumpedByAnubis',
-    }
+    };
 
-    prismaServiceMock.user.update.mockResolvedValue({ ...fakeUser, ...newName });
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...fakeUserWithoutPassword } = fakeUser;
+
+    prismaServiceMock.user.update.mockResolvedValue({
+      ...fakeUserWithoutPassword,
+      ...newName,
+    });
     const result = await service.update(fakeUser.id, newName);
-    expect(result).toEqual({ ...fakeUser, ...newName });
+    expect(result).toEqual({ ...fakeUserWithoutPassword, ...newName });
     expect(prismaServiceMock.user.update).toHaveBeenCalledWith({
       where: {
         id: fakeUser.id,
       },
-
       data: newName,
-    })
-  })
+      omit: {
+        password: true,
+      }
+    });
+  });
 
   it('should be able to delete a user', async () => {
     const fakeUser = {
@@ -167,7 +172,7 @@ describe('UserService', () => {
       name: 'LewandowskiM10',
       email: 'LewandowskiM10@gmail.com',
       password: 'reidaequipetumulto2019',
-    }
+    };
 
     prismaServiceMock.user.findUnique.mockResolvedValue(fakeUser);
     prismaServiceMock.user.delete.mockResolvedValue(fakeUser);
@@ -176,7 +181,7 @@ describe('UserService', () => {
     expect(prismaServiceMock.user.delete).toHaveBeenCalledWith({
       where: {
         id: fakeUser.id,
-      }
-    })
-  })
+      },
+    });
+  });
 });

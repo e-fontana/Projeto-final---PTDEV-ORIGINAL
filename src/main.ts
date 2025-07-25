@@ -11,12 +11,12 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle('Fala, Pablo!')
+    .setTitle('Fala, Pablo! ')
     .setDescription(
-      'Acho que você deveria passar os três trainees! Não são gente, mas possuem sentimentos! \n\n Amamos você! 💛🖤',
+      '(se você não é o Pablo, finja que é o seu nome aqui!)\n\nAcho que você deveria passar os três trainees! Não são gente, mas possuem sentimentos! \n\n Amamos você! 💛🖤',
     )
     .setVersion('1.0')
-    .addTag('final-project')
+    .addTag('PROJETO FINAL TITÂNICO! 🤖')
     .addBearerAuth(
       {
         type: 'http',

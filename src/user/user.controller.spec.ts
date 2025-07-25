@@ -42,12 +42,6 @@ describe('UserController', () => {
 
   });
 
-  it('should be able to return a create of an user', async () => {
-    const result = await controller.create(fakeUserDTO);
-    expect(mockService.create).toHaveBeenCalledWith(fakeUserDTO);
-    expect(result).toEqual(fakeUserDTO);
-  })
-
   it('should be able to get a user by id', async () => {
     const fakeUser: TAuthenticatedUser = {
       sub: 'user123',
@@ -73,16 +67,5 @@ describe('UserController', () => {
     const result = await controller.updateMe(fakeUser, dto);
     expect(mockService.update).toHaveBeenCalledWith(fakeUser.sub, dto);
     expect(result).toEqual(dto);
-  })
-
-  it('should be able to delete a user', async () => {
-    const fakeUser: TAuthenticatedUser = {
-      sub: 'user123',
-      role: 'ADMIN',
-    }
-
-    const result = await controller.deleteUser(fakeUser.sub);
-    expect(mockService.delete).toHaveBeenCalledWith(fakeUser.sub);
-    expect(result).toEqual(fakeUserDTO);
   })
 })

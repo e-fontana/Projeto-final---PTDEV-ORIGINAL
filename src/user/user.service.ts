@@ -51,14 +51,9 @@ export class UserService {
   async findWithoutPassword(id: string) {
     const user = await this.prismaService.user.findUnique({
       where: { id: id },
-      select: {
-        id: true,
-        name: true,
-        username: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
+      omit: {
+        password: true,
+      }
     });
 
     if (!user) {

@@ -7,7 +7,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { TAuthenticatedUser } from 'src/auth/strategies/jwt-auth.strategy';
 import { Roles } from 'src/common/decorators/role.decorator';
 import { User } from '../common/decorators/user.decorator';
@@ -15,6 +15,7 @@ import { CreateReservationDto } from './dto/create-reservation.dto';
 import { ReservationService } from './reservation.service';
 
 @Roles('USER')
+@ApiTags('Reservas')
 @ApiBearerAuth('access_token')
 @Controller('reservations')
 export class ReservationController {

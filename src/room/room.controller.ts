@@ -15,7 +15,7 @@ import { UpdateRoomDTO } from './dto/update-room.dto';
 import { UpdateStatusDTO } from './dto/update-status.dto';
 import { RoomService } from './room.service';
 
-@ApiTags('Room')
+@ApiTags('Salas')
 @ApiBearerAuth('access_token')
 @Controller('rooms')
 export class RoomController {
