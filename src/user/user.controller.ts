@@ -17,7 +17,6 @@ import {
 } from './dto/update-user.dto';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { TRegisterUser } from 'src/auth/dto/register.dto';
 
 @Controller('users')
 export class UserController {
@@ -30,12 +29,7 @@ export class UserController {
 
   @Get('me')
   async getMeById(@User() user: TAuthenticatedUser) {
-    return this.service.findById(user.sub);
-  }
-
-  @Get('me/email')
-  async getMeByEmail(@Body () data: TRegisterUser) {
-    return this.service.findByEmail(data.email); //PERGUNTAR A FONTANA, PQ MEXE NO AUTH
+    return this.service.findWithoutPassword(user.sub);
   }
 
   @Put('me')

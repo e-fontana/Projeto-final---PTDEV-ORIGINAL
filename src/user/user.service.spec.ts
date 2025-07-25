@@ -8,7 +8,7 @@ describe('UserService', () => {
     user: {
       create: jest.Mock;
       findById: jest.Mock;
-      findByEmail: jest.Mock;
+      findWithoutPassword: jest.Mock;
       findUnique: jest.Mock;
       findFirst: jest.Mock;
       update: jest.Mock;
@@ -20,7 +20,7 @@ describe('UserService', () => {
       user: {
         create: jest.fn(),
         findById: jest.fn(),
-        findByEmail: jest.fn(),
+        findWithoutPassword: jest.fn(),
         findUnique: jest.fn(),
         findFirst: jest.fn(),
         update: jest.fn(),
@@ -96,27 +96,43 @@ describe('UserService', () => {
     })
   })
 
-  it('should be able to throw error if user does not exists', async () => {
-    prismaServiceMock.user.findUnique.mockResolvedValue(null);
-    await expect(service.findByEmail('nossssshumilhadooooo')).rejects.toThrow('User not found');
-  })  
-
-  it('should be able to find an user by email', async () => {
+  it('should be able to find an user without password', async () => {
     const fakeUser = {
-      id: 'user234',
-      name: 'lordpepino06',
-      email: 'lordpepino06@gmail.com',
-      password: 'pedrinhodascardourada2013',
+      id: 'user123',
+      name: 'paulinho',
+      role: 'USER',
+      email: 'paulinhodomine@gmail.com',
+      password: 'oxipaulinhooxi',
+    	createdAt: '2025-07-24T12:38:07.352Z',
+	    updatedAt: '2025-07-24T13:39:49.143Z'
     }
 
-    prismaServiceMock.user.findUnique.mockResolvedValue(fakeUser);
-    const result = await service.findByEmail(fakeUser.email);
-    expect(result).toEqual(fakeUser);
+        const fakeUserWithoutPassword = {
+      id: 'user123',
+      name: 'paulinho',
+      email: 'paulinhodomine@gmail.com',
+      password: 'oxipaulinhooxi',
+      role: 'USER',
+    	createdAt: '2025-07-24T12:38:07.352Z',
+	    updatedAt: '2025-07-24T13:39:49.143Z'
+    }
+
+    prismaServiceMock.user.findUnique.mockResolvedValue(fakeUserWithoutPassword);
+    const result = await service.findWithoutPassword(fakeUser.id);
+    expect(result).toEqual(fakeUserWithoutPassword);
     expect(prismaServiceMock.user.findUnique).toHaveBeenCalledWith({
-      where: { 
-        email: fakeUser.email,
-       }
-    })
+      where: {
+        id: fakeUser.id,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   })
   
   it('should be able to update a user', async () => {

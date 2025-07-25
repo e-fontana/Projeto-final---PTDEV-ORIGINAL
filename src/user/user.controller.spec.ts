@@ -15,15 +15,11 @@ describe('UserController', () => {
   }
 
   const mockService = {
-    findById: jest.fn().mockResolvedValue(fakeUserDTO),
-
-    findByEmail: jest.fn().mockResolvedValue(fakeUserDTO),
+    findWithoutPassword: jest.fn().mockResolvedValue(fakeUserDTO),
 
     create: jest.fn().mockResolvedValue(fakeUserDTO),
 
     getMeById: jest.fn().mockResolvedValue(fakeUserDTO),
-
-    getMeByEmail: jest.fn().mockResolvedValue(fakeUserDTO),
 
     delete: jest.fn().mockResolvedValue(fakeUserDTO),
 
@@ -58,13 +54,7 @@ describe('UserController', () => {
       role: 'USER',
     }
     const result = await controller.getMeById(fakeUser);
-    expect(mockService.findById).toHaveBeenCalledWith(fakeUser.sub);
-    expect(result).toEqual(fakeUserDTO);
-  })
-
-   it('should be able to get a user by email', async () => {
-    const result = await controller.getMeByEmail(fakeUserDTO);
-    expect(mockService.findByEmail).toHaveBeenCalledWith(fakeUserDTO.email);
+    expect(mockService.findWithoutPassword).toHaveBeenCalledWith(fakeUser.sub);
     expect(result).toEqual(fakeUserDTO);
   })
 

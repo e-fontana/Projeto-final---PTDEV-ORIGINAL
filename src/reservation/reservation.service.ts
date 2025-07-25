@@ -25,7 +25,7 @@ export class ReservationService {
         roomId: createReservationDto.roomId,
         startAt: {lt: createReservationDto.endAt},
         endAt: {gt: createReservationDto.startAt},
-      } //AVALIAR SE TROCA POR APENAS BUSCAR PELO ID( PERGUNTAR ISSO )
+      } 
     })
 
     if (reservationConflict) {

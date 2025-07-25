@@ -44,6 +44,26 @@ export class UserService {
     return user;
   }
 
+  async findWithoutPassword(id: string){
+    const user = await this.prismaService.user.findUnique({
+      where: { id: id },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      }
+    });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    return user;
+  }
+
   async findByEmail(email: string) {
     const user = await this.prismaService.user.findUnique({
       where: { email: email },
