@@ -25,7 +25,6 @@ export class AuthService {
       username: registerUserDto.username,
       name: registerUserDto.name,
       password: hashedPassword,
-      role: registerUserDto.role,
     });
   }
 

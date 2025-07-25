@@ -29,7 +29,6 @@ export class UserService {
         email: data.username,
         name: data.name,
         password: data.password,
-        role: data.role || 'USER',
       },
       omit: {
         password: true,
